@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/admin/adminHeader::html(后台管理)"></head>
+<body>
+<script>
+$(function() {
+	var data4Vue = {
+			uri:"roominfos",
+			bean:{id:0,price:'',number:'',remarks:'',roomType:{id:1}},
+			pagination:[],
+			beans:[],
+			roomTypes:[]
+		};
+		
+	var vue = new Vue({
+		el:"#workingArea",
+		data:data4Vue,
+		mounted:function(){
+			this.getRoomTypes();
+			this.list(0);
+		},
+		methods:{
+			getRoomTypes:function(){
+				var url = "roomtypes";
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.roomTypes = result.data;
+				});
+			},
+			list:function(start){
+				var url = this.uri+"?start="+start;
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.pagination = result.data;
+					vue.beans = vue.pagination.content;
+				});
+			},
+			add:function(){
+				if(!checkEmpty(this.bean.number,"房号"))
+                    return;
+				if(!checkEmpty(this.bean.roomType.id,"类型"))
+                    return;
+				if(!checkEmpty(this.bean.price,"价格"))
+                    return;
+				var url = this.uri;
+				axios.post(url,this.bean).then(function(response){
+					vue.list(0);
+					vue.bean = {id:0,price:0,roomType:{id:1}};
+				});
+			},
+			deleteBean:function(id){
+				if(!checkDeleteLink())
+					return;
+				var url = this.uri+"/"+id;
+				axios.delete(url,this.bean).then(function(response){
+					var result = response.data;
+					if(result.code != 0)
+						alert(result.message);
+					else
+						vue.list(0);
+				});
+			},
+			roomType:function(){
+				location.href = "admin_roomtype_list";
+			},//房号不为负，且长度不长于6位数
+			checkNumber:function(value){
+				if(value<=0){
+					vue.bean.number = 1;
+				}
+				if(value.length>6){
+					vue.bean.number = value.slice(0,6);
+				}
+			},//价格不为负，且长度不长于6位数
+			checkPrice:function(value){
+				if(value<=0){
+					vue.bean.price = 1;
+				}
+				if(value.length>6){
+					vue.bean.price = value.slice(0,6);
+				}
+			},
+            jump: function(page){
+                jump(page,vue); //定义在adminHeader.html 中
+            },
+            jumpByNumber: function(start){
+                jumpByNumber(start,vue);
+            }
+		}
+	});
+});
+</script>
+<div class="container" id="workingArea">
+	<div class="row clearfix">
+	
+		<div th:include="include/admin/adminNavigator::html"></div>
+		
+		<div class="col-md-10 column">
+			<ul class="breadcrumb">
+			    <li class="active">客房设置</li>
+			</ul>
+			
+			<div class="form-group">
+			    <button @click="roomType" type="button" class="btn btn-default">房间类型</button>
+			</div>
+			
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th>状态</th>
+						<th>房号</th>
+						<th>类型</th>
+						<th>价格/天</th>
+						<th>备注</th>
+						<th>编辑</th>
+						<th>删除</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="bean in beans">
+						<td v-if="bean.status==0">空房</td>
+						<td v-if="bean.status==1">预约</td>
+						<td v-if="bean.status==2">入住</td>
+						<td v-if="bean.status==3">维修</td>
+						<td>{{bean.number}}</td>
+						<td>{{bean.roomType.name}}</td>
+						<td>{{bean.price}}</td>
+						<td class="limit">{{bean.remarks}}</td>
+						<td><a :href="'admin_room_edit?id='+bean.id"><span class="glyphicon glyphicon-edit"></a></td>
+						<td><a href="#" @click="deleteBean(bean.id)"><span class="glyphicon glyphicon-trash"></a></td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<div  class="pageDiv" th:include="include/admin/adminPage::html"></div>
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">新增房间</div>
+				<div class="panel-body">
+					<form role="form">
+						<div class="row form-group">
+						    <div class="col-lg-3">
+						    	<label>房号</label>
+						    	<input type="number" @input="checkNumber(bean.number)" v-model.vrim="bean.number" class="form-control" placeholder="输入房号">
+						    </div>
+						    <div class="col-lg-3">
+						    	<label>类型</label>
+						    	<select v-model.vrim="bean.roomType.id"  class="form-control">
+									<option v-for="roomType in roomTypes" :value="roomType.id">{{roomType.name}}</option>
+								</select>
+						    </div>
+						    <div class="col-lg-3">
+						    	<label>价格</label>
+						    	<input type="number" @input="checkPrice(bean.price)" v-model.vrim="bean.price" class="form-control" placeholder="输入价格">
+						    </div>
+						    <div class="col-lg-3">
+						    	<label>备注</label>
+						    	<input type="text" maxlength="20" v-model.vrim="bean.remarks" class="form-control" placeholder="备注">
+						    </div>
+					  	</div>
+						<div class="form-group">
+							<button type="button" @click="add" class="btn btn-default">提交</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+</body>
+</html>

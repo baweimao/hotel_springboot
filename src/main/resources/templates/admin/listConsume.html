@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/admin/adminHeader::html(后台管理)"></head>
+<body>
+<script>
+$(function() {
+	var id = getUrlParms("id");
+	var data4Vue = {
+			uri:"consumeinfos",
+			bean:{id:0, number:1, productInfo:{id:''}},
+			beans:[],
+			productInfos:[]
+		};
+		
+	var vue = new Vue({
+		el:"#workingArea",
+		data:data4Vue,
+		mounted:function(){
+			this.list();
+			this.getProductInfos();
+		},
+		methods:{
+			getProductInfos:function(){
+				var url = "productinfos/all";
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.productInfos = result.data;
+				});
+			},
+			list:function(){
+				var url = "/orderinfos/"+id+"/"+this.uri;
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.beans = result.data;
+				});
+			},
+			add:function(){
+				if(!checkEmpty(this.bean.productInfo.id,"商品"))
+                    return;
+				if(!checkEmpty(this.bean.number,"数量"))
+                    return;
+				var url = "/orderinfos/"+id+"/"+this.uri;
+				axios.post(url,this.bean).then(function(response){
+					vue.list();
+					vue.bean = {id:0, number:1, productInfo:{id:''}};
+				});
+			},
+			deleteBean:function(id){
+				if(!checkDeleteLink())
+					return;
+				var url = this.uri+"/"+id;
+				axios.delete(url,this.bean).then(function(response){
+					vue.list();
+				});
+			},//天数不为负，且长度不长于2位数
+			checkPlus:function(value){
+				if(value<=0){
+					vue.bean.number = 1;
+				}
+				if(value.length>2){
+					vue.bean.number = value.slice(0,2);
+				}
+			}
+		}
+	});
+});
+</script>
+<div class="container" id="workingArea">
+	<div class="row clearfix">
+	
+		<div th:include="include/admin/adminNavigator::html"></div>
+		
+		<div class="col-md-10 column">
+			<ul class="breadcrumb">
+			    <li><a href="admin_hotel_list">住宿登记</a></li>
+			    <li class="active">商品消费</li>
+			</ul>
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th>商品名</th>
+						<th>类型</th>
+						<th>单价</th>
+						<th>数量</th>
+						<th>总价</th>
+						<th>删除</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="bean in beans">
+						<td>{{bean.productInfo.name}}</td>
+						<td>{{bean.productInfo.productType.name}}</td>
+						<td>{{bean.productInfo.price}}</td>
+						<td>{{bean.number}}</td>
+						<td>{{bean.number * bean.productInfo.price}}</td>
+						<td><a href="#" @click="deleteBean(bean.id)"><span class="glyphicon glyphicon-trash"></a></td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="panel panel-default">
+				<div class="panel-heading">新增消费</div>
+				<div class="panel-body">
+					<form role="form">
+						<div class="row form-group">
+						    <div class="col-lg-6">
+						    	<label>选择商品</label>
+						    	<select v-model="bean.productInfo.id"  class="form-control">
+									<option v-for="productInfo in productInfos" :value="productInfo.id">{{productInfo.name}}</option>
+								</select>
+						    </div>
+						    <div class="col-lg-6">
+						    	<label>数量</label>
+						    	<input type="number" @input="checkPlus(bean.number)" v-model.vrim="bean.number" class="form-control" placeholder="输入数量">
+						    </div>
+						</div>
+						<div class="form-group">
+							<button type="button" @click="add" class="btn btn-default">提交</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+</body>
+</html>

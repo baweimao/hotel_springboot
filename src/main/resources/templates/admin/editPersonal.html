@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/admin/adminHeader::html(后台管理)"></head>
+<body>
+<script>
+$(function() {
+	var id = getUrlParms("id");
+	var data4Vue = {
+			uri:"personalinfos",
+			bean:{id:0,name:'',sex:0,number:0,address:'',phone:0,remarks:'',papersType:{id:1},nation:''},
+			papersTypes:[]
+		};
+		
+	var vue = new Vue({
+		el:"#workingArea",
+		data:data4Vue,
+		mounted:function(){
+			this.get();
+			this.getPapersTypes();
+		},
+		methods:{
+			getPapersTypes:function(){
+				var url = "paperstypes";
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.papersTypes = result.data;
+				});
+			},
+			get:function(){
+				var url = this.uri+"/"+id;
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.bean = result.data;
+				});
+			},
+			update:function(){
+				if(!checkEmpty(this.bean.name,"姓名"))
+                    return;
+				if(!checkEmpty(this.bean.sex,"性别"))
+                    return;
+				if(!checkEmpty(this.bean.number,"证件号"))
+                    return;
+				var url = this.uri;
+				axios.put(url,this.bean).then(function(response){
+					location.href = "admin_personal_list";
+				});
+			},//身份证不为负，且长度不长于18位数
+			checkNumber:function(value){
+				if(value<=0){
+					vue.bean.number = 1;
+				}
+				if(value.length>18){
+					vue.bean.days = value.slice(0,18);
+				}
+			},//手机号不为负，且长度不长于11位数
+			checkPhone:function(value){
+				if(value<=0){
+					vue.bean.phone = 1;
+				}
+				if(value.length>11){
+					vue.bean.phone = value.slice(0,11);
+				}
+			}
+		}
+	});
+});
+</script>
+<div class="container" id="workingArea">
+	<div class="row clearfix">
+	
+		<div th:include="include/admin/adminNavigator::html"></div>
+		
+		<div class="col-md-10 column">
+			<ul class="breadcrumb">
+				<li><a href="admin_personal_list">个人登记</a></li>
+			    <li class="active">资料编辑</li>
+			</ul>
+			<div class="panel panel-default">
+				<div class="panel-heading">新增客人</div>
+				<div class="panel-body">
+					<form role="form">
+						<div class="row form-group">
+						    <div class="col-lg-3">
+							    <label>姓名</label>
+							    <input type="text" maxlength="4" v-model.vrim="bean.name" class="form-control" placeholder="旅客姓名">
+						    </div>
+						    <div class="col-lg-3">
+							    <label>性别</label>
+							    <select v-model.vrim="bean.sex"  class="form-control">
+									<option value="0">男</option>
+									<option value="1">女</option>
+								</select>
+						    </div>
+						    <div class="col-lg-3">
+						    	<label>证件类型</label>
+					      		<select v-model.vrim="bean.papersType.id"  class="form-control">
+									<option v-for="papersType in papersTypes" :value="papersType.id">{{papersType.name}}</option>
+								</select>
+						    </div>
+						    <div class="col-lg-3">
+						    	<label>证件号</label>
+						    	<input type="number" @input="checkNumber(bean.number)" oninput="if(value.length>18)value=value.slice(0,18)" v-model.vrim="bean.number" class="form-control" placeholder="证件号">
+						    </div>
+					  	</div>
+					  	<div class="row form-group">
+					  		<div class="col-lg-3">
+						    	<label>民族</label>
+						    	<input type="text" maxlength="5" v-model.vrim="bean.nation" class="form-control" placeholder="民族">
+						    </div>
+							<div class="col-lg-3">
+						    	<label>户籍</label>
+						    	<input type="text" maxlength="5" v-model.vrim="bean.address" class="form-control" placeholder="户籍">
+						    </div>
+						    <div class="col-lg-3">
+						    	<label>联系方式</label>
+						    	<input type="number" @input="checkPhone(bean.phone)" oninput="if(value.length>11)value=value.slice(0,11)" v-model.vrim="bean.phone" class="form-control" placeholder="联系方式">
+						    </div>
+						    <div class="col-lg-3">
+						    	<label>备注</label>
+						    	<input type="text" maxlength="20" v-model.vrim="bean.remarks" class="form-control" placeholder="备注">
+						    </div>
+						</div>
+						<div class="form-group">
+							<button type="button" @click="update" class="btn btn-default">提交</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/admin/adminHeader::html(后台管理)"></head>
+<body>
+<script>
+$(function() {
+	var id = getUrlParms("id");
+	var data4Vue = {
+			uri:"orderinfos",
+			bean:{id:0, days:1, remarks:'', roomInfo:{id:''}, teamInfo:{id:1}},
+			oldriid:'', //旧房间id
+			pagination:[],
+			beans:[],
+			roomInfos:[],
+			teamInfos:[],
+			count:null
+		};
+		
+	var vue = new Vue({
+		el:"#workingArea",
+		data:data4Vue,
+		mounted:function(){
+			this.get();
+			this.getPersonalInfos();
+			this.getRoomInfos();
+			this.getTeamInfos();
+		},
+		methods:{
+			getPersonalInfos:function(){
+				var url = "personalinfos/all";
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.personalInfos = result.data;
+				});
+			},
+			getRoomInfos:function(){
+				var url = "/roominfos/able/all";
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.roomInfos = result.data;
+				});
+			},
+			getTeamInfos:function(){
+				var url = "/teaminfos/all";
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.teamInfos = result.data;
+				});
+			},
+			get:function(){
+				var url = this.uri+"/"+id;
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.bean = result.data;
+					vue.oldriid = vue.bean.roomInfo.id; //获取旧房间id
+				});
+			},
+			update:function(){
+				if(!checkEmpty(this.bean.teamInfo.id,"团队类型"))
+                    return;
+				if(!checkEmpty(this.bean.roomInfo.id,"选房"))
+                    return;
+				if(!checkEmpty(this.bean.days,"天数"))
+                    return;
+				var url = this.uri + "/register?oldriid=" + this.oldriid;
+				axios.put(url, this.bean).then(function(response){
+					location.href = "admin_hotel_list";
+				});
+			},//选择房间
+			selected:function(id, index){
+				if(this.count != index){
+					this.count = index;
+					this.bean.roomInfo.id = id;
+				}
+				else{
+					this.count = null;
+					this.bean.roomInfo.id = '';
+				}
+			},//天数不为负，且长度不长于2位数
+			checkPlus:function(value){
+				if(value<=0){
+					vue.bean.days = 1;
+				}
+				if(value.length>2){
+					vue.bean.days = value.slice(0,2);
+				}
+			}
+		}
+	});
+});
+</script>
+<div class="container" id="workingArea">
+	<div class="row clearfix">
+	
+		<div th:include="include/admin/adminNavigator::html"></div>
+		
+		<div class="col-md-10 column">
+			<ul class="breadcrumb">
+			    <li><a href="admin_hotel_list">住宿登记</a></li>
+			    <li class="active">编辑</li>
+			</ul>
+			<div class="panel panel-default">
+				<div class="panel-heading">编辑住宿</div>
+				<div class="panel-body">
+					<form role="form">
+						<div class="row form-group">
+						
+							<div class="col-lg-12">
+								<label>选房</label>
+								<div class="roomDiv">
+									<div v-for="roomInfo,index in roomInfos" class="roomSelect" @click="selected(roomInfo.id,index)" :class="{'roomSelected':index==count}">
+										<div><span>类型：</span>{{roomInfo.roomType.name}}</div>
+										<div><span>房号：</span>{{roomInfo.number}}</div>
+										<div><span>房价：</span>{{roomInfo.price}}</div>
+										<div>
+											<span>状态：</span>
+											<span v-if="roomInfo.status==0">空房</span>
+											<span v-if="roomInfo.status==1">预约</span>
+											<span v-if="roomInfo.status==2">入住</span>
+											<span v-if="roomInfo.status==3">维修</span>
+										</div>
+									</div>
+								</div>
+								<div style="clear: both;"></div>
+							</div>
+						</div>
+
+						<div class="row form-group">
+							<div class="col-lg-4">
+						    	<label>团队类型</label>
+						    	<select v-model="bean.teamInfo.id"  class="form-control">
+									<option v-for="teamInfo in teamInfos" :value="teamInfo.id">{{teamInfo.name}}</option>
+								</select>
+						    </div>
+						    <div class="col-lg-4">
+						    	<label>天数</label>
+						    	<input type="number" @input="checkPlus(bean.days)" v-model.vrim="bean.days" class="form-control" placeholder="输入天数">
+						    </div>
+						    <div class="col-lg-4">
+						    	<label>备注</label>
+						    	<input type="text" v-model.vrim="bean.remarks" class="form-control" placeholder="备注">
+						    </div>
+					  	</div>
+						<div class="form-group">
+							<button type="button" @click="update" class="btn btn-default">提交</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
+</body>
+</html>

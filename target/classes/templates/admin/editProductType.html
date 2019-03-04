@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/admin/adminHeader::html(后台管理)"></head>
+<body>
+<script>
+$(function() {
+	var id = getUrlParms("id");
+	var data4Vue = {
+			uri:"producttypes",
+			bean:{id:0,name:''}
+		};
+		
+	var vue = new Vue({
+		el:"#workingArea",
+		data:data4Vue,
+		mounted:function(){
+			this.get();
+		},
+		methods:{
+			get:function(){
+				var url = this.uri+"/"+id;
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.bean = result.data;
+				});
+			},
+			update:function(){
+				if(!checkEmpty(this.bean.name,"类名"))
+                    return;
+				var url = this.uri;
+				axios.put(url, this.bean).then(function(response){
+					location.href = "admin_producttype_list";
+				});
+			}
+		}
+	});
+});
+</script>
+<div class="container" id="workingArea">
+	<div class="row clearfix">
+	
+		<div th:include="include/admin/adminNavigator::html"></div>
+		
+		<div class="col-md-10 column">
+			<ul class="breadcrumb">
+			    <li><a href="admin_product_list">商品设置</a></li>
+			    <li><a href="admin_producttype_list">商品类型</a></li>
+			    <li class="active">类型编辑</li>
+			</ul>
+			<div class="panel panel-default">
+				<div class="panel-heading">类型编辑</div>
+				<div class="panel-body">
+					<form role="form">
+						<div class="row form-group">
+						    <div class="col-lg-12">
+						      <label>商品类型</label>
+						      <input type="text" v-model.vrim="bean.name" class="form-control" placeholder="类名">
+						    </div>
+					  	</div>
+						<div class="form-group">
+							<button type="button" @click="update" class="btn btn-default">提交</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
+</body>
+</html>

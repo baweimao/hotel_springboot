@@ -1,0 +1,138 @@
+<template th:fragment="html">
+
+<script>
+$(function() {
+	//点击导航当前手风琴效果打开
+	$("a.navLink").each(function() {
+	if(this.href==window.location.href){
+		$(this).parents("ul").addClass('in');
+		//并把导航箭头变换
+		var li = $(this).parents("ul").prev();
+		li.children("a").children("b.arrow").removeClass("fa-caret-left").addClass('fa-caret-down');
+	}
+	});
+	
+	//点击导航箭头变换
+	$("a.navA").click(function() {
+		var b = $(this).children("b.arrow");
+		if(b.hasClass("fa-caret-left"))
+			b.removeClass("fa-caret-left").addClass('fa-caret-down');
+		else
+			b.removeClass("fa-caret-down").addClass('fa-caret-left');
+	});
+
+});
+</script>
+
+<div class="row clearfix">
+	<div class="col-md-12 column">
+		<div class="page-header">
+			<h1>
+				酒店住宿管理系统 <small>Hotel Management System</small>
+			</h1>
+		</div>
+	</div>
+</div>
+<div class="col-md-2 column" id="workingNav">
+	<ul class="nav nav-list navUl">
+		<li data-toggle="collapse" data-target="#stay">
+			<a href="#" class="navA">
+				<b class="fa fa-bed"></b>
+				住宿管理
+				<b class="fa fa-caret-left arrow"></b>
+			</a>
+		</li>
+			<ul id="stay" class="nav nav-list collapse">
+				<li>
+					<a class="navLink" href="admin_mark_list">
+						<b class="fa fa-bell"></b>
+						客房预约
+					</a>
+				</li>
+				<li>
+					<a class="navLink" href="admin_hotel_list">
+						<b class="fa fa-paint-brush"></b>
+						住宿登记
+					</a>
+				</li>
+			</ul>
+		<li data-toggle="collapse" data-target="#register">
+			<a href="#" class="navA">
+				<b class="fa fa-address-card"></b>
+				登记管理
+				<b class="fa fa-caret-left arrow"></b>
+			</a>
+		</li>
+			<ul id="register"  class="nav nav-list collapse">
+				<li>
+					<a class="navLink" href="admin_personal_list">
+						<b class="glyphicon glyphicon-user"></b>
+						个人登记
+					</a>
+				</li>
+				<li>
+					<a class="navLink" href="admin_team_list">
+						<b class="fa fa-group"></b>
+						团队登记
+					</a>
+				</li>
+			</ul>
+		<li data-toggle="collapse" data-target="#room">
+			<a href="#" class="navA">
+				<b class="glyphicon glyphicon-home"></b>
+				房间管理
+				<b class="fa fa-caret-left arrow"></b>
+			</a>
+		</li>
+			<ul id="room" class="nav nav-list collapse">
+				<li>
+					<a class="navLink" href="admin_room_list">
+						<b class="glyphicon glyphicon-cog"></b>
+						客房设置
+					</a>
+				</li>
+				<li>
+					<a class="navLink" href="admin_product_list">
+						<b class="fa fa-coffee"></b>
+						商品设置
+					</a>
+				</li>
+			</ul>
+		<li data-toggle="collapse" data-target="#query">
+			<a href="#" class="navA">
+				<b class="fa fa-dedent"></b>
+				查询管理
+				<b class="fa fa-caret-left arrow"></b>
+			</a>
+		</li>
+			<ul id="query" class="nav nav-list collapse">
+				<li>
+					<a class="navLink" href="admin_querytime_list">
+						<b class="fa fa-reorder"></b>
+						账单管理
+					</a>
+				</li>
+				<li>
+					<a class="navLink" href="admin_querypersonal_list">
+						<b class="fa fa-search"></b>
+						旅客查询
+					</a>
+				</li>
+				<li>
+					<a class="navLink" href="admin_data_list" >
+						<b class="fa fa-bar-chart"></b>
+						数据统计
+					</a>
+				</li>
+			</ul>
+		
+		<li>
+			<a href="logout" class="navA navLogout">
+				<b class="glyphicon glyphicon-log-out"></b>
+				退出登录
+			</a>
+		</li>
+	</ul>
+</div>
+
+</template>

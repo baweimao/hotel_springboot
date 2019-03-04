@@ -1,0 +1,113 @@
+
+div.pageDiv {
+	text-align: center;
+	margin: 0px auto;
+}
+
+
+/**********导航效果***************/
+
+table.table {
+	border: 1px solid #DDDDDD;
+}
+
+ul.navUl {
+	border: 1px solid #DDDDDD;
+}
+
+ul.navUl a{
+	color: #2e2e2e;
+/* 	background-color: #c2c2c2; */
+}
+
+a.navA b.arrow {
+	margin-left: 40px;
+}
+
+a.navA {
+	background-color: #F5F5F5;
+}
+
+a.navA:hover {
+/* 	color: #ffffff; */
+/* 	background-color: #464646; */
+}
+
+a.navLogout {
+	text-align: left;
+	position: absolute;
+}
+
+/**********表格边界限制***************/
+.table th, .table td { 
+text-align: center;
+vertical-align: middle!important;
+}
+
+table {
+	table-layout: fixed;
+}
+
+/* th { */
+/* 	width: 50px; */
+/* } */
+
+td, th {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow:hidden;
+}
+
+
+/**********房间选择***************/
+
+div.roomDiv {
+	overflow-y: scroll;
+	height: 200px;
+	padding: 0px 15px;
+	border: 1px solid #c0c0c0;
+}
+
+div.roomSelect {
+	float: left;
+	height: 90px;
+	width: 90px;
+	margin-left: 5px;
+	margin-top: 5px;
+	text-align: center;
+	padding: 5px 0px;
+	color: #ffffff;
+	background-color: #4f9d9d;
+	cursor: pointer;
+}
+
+div.roomSelect:hover {
+	color: #f5f5f5;
+	background-color: #264d4d;
+}
+
+.roomSelected {
+	color: #f5f5f5!important;
+	background-color: #264d4d!important;
+}
+
+div.roomSelect div {
+	line-height: 20px;
+}
+
+
+/**********旅客选择***************/
+
+div.peopleDiv {
+	overflow-y: scroll;
+	height: 500px;
+	padding: 0px 15px;
+	border: 1px solid #c0c0c0;
+}
+
+h1.nodata {
+	height: 400px;
+	line-height: 400px;
+	text-align: center;
+	color: #c0c0c0;
+}

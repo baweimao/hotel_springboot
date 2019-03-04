@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/admin/adminHeader::html(后台管理)"></head>
+<body>
+<script>
+$(function() {
+	var id = getUrlParms("id");
+	var data4Vue = {
+			registerInfos:[],
+			consumeInfos:[]
+		};
+		
+	var vue = new Vue({
+		el:"#workingArea",
+		data:data4Vue,
+		mounted:function(){
+			this.getRegisterInfos();
+			this.getConsumeInfos();
+		},
+		methods:{
+			getRegisterInfos:function(){
+				var url = "/orderinfos/"+id+"/registerinfos";
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.registerInfos = result.data;
+				});
+			},
+			getConsumeInfos:function(){
+				var url = "/orderinfos/"+id+"/consumeinfos";
+				axios.get(url).then(function(response){
+					var result = response.data;
+					vue.consumeInfos = result.data;
+				});
+			}
+		}
+	});
+});
+</script>
+<div class="container" id="workingArea">
+	<div class="row clearfix">
+	
+		<div th:include="include/admin/adminNavigator::html"></div>
+		
+		<div class="col-md-10 column">
+			<ul class="breadcrumb">
+			    <li><a href="admin_querytime_list">账单管理</a></li>
+			    <li class="active">详情</li>
+			</ul>
+			<p class="bg-primary">入住登记</p>
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th>入住人</th>
+						<th>性别</th>
+						<th>证件类型</th>
+						<th style="width: 160px;">证件号</th>
+						<th>户籍</th>
+						<th style="width: 110px;">联系方式</th>
+						<th>备注</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="registerInfo in registerInfos">
+						<td>{{registerInfo.personalInfo.name}}</td>
+						<td v-if="registerInfo.personalInfo.sex==0">男</td>
+						<td v-if="registerInfo.personalInfo.sex==1">女</td>
+						<td>{{registerInfo.personalInfo.papersType.name}}</td>
+						<td>{{registerInfo.personalInfo.number}}</td>
+						<td>{{registerInfo.personalInfo.address}}</td>
+						<td>{{registerInfo.personalInfo.phone}}</td>
+						<td>{{registerInfo.personalInfo.remarks}}</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<p class="bg-primary">消费记录</p>
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th>商品名</th>
+						<th>类型</th>
+						<th>单价</th>
+						<th>数量</th>
+						<th>总价</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="consumeInfo in consumeInfos">
+						<td>{{consumeInfo.productInfo.name}}</td>
+						<td>{{consumeInfo.productInfo.productType.name}}</td>
+						<td>{{consumeInfo.productInfo.price}}</td>
+						<td>{{consumeInfo.number}}</td>
+						<td>{{consumeInfo.number * consumeInfo.productInfo.price}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+</div>
+</body>
+</html>

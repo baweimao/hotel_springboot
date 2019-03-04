@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include/admin/adminHeader::html(后台管理)"></head>
+<body>
+<script>
+$(function() {
+	
+	var data4Vue = {
+			uri:"orderinfos",
+		};
+	
+	var vue = new Vue({
+		el:"#workingArea",
+		data:data4Vue,
+		mounted:function(){
+			this.list();
+		},
+		methods:{
+			//查询最近12个月营收
+			list:function(){
+				var url = this.uri + "/data";
+				axios.get(url).then(function(response){
+					var result = response.data;
+					var beans = result.data;
+
+					var months = beans.months;
+					var totals = beans.totals;
+					var peoples = beans.peoples;
+					var totalCanvas = document.getElementById("totalChart").getContext("2d");
+					var peopleCanvas = document.getElementById("peopleChart").getContext("2d");
+					
+				    var totalChart = new Chart(totalCanvas, {
+				    	  type: 'line', //图表类型
+				    	  data: {
+				    		// 表现在X轴上的数据，数组形式  ["China", "India", "United States", "Indonesia", "Brazil", "Pakistan", "Nigeria", "Bangladesh", "Russia", "Japan"]
+				    	    labels: months,
+				    	    //数据折线   data: [1379302771, 1281935911, 326625791, 260580739, 207353391, 204924861, 190632261, 157826578, 142257519, 126451398],
+				    	    datasets: [{
+				    	      label: '月营收',
+				    	      data: totals,
+				    	      backgroundColor: [
+				    	    	'rgba(54, 162, 235, 0.6)',
+				    	        'rgba(255, 99, 132, 0.6)',
+				    	        'rgba(255, 206, 86, 0.6)',
+				    	        'rgba(75, 192, 192, 0.6)',
+				    	        'rgba(153, 102, 255, 0.6)',
+				    	        'rgba(255, 159, 64, 0.6)',
+				    	        'rgba(255, 99, 132, 0.6)',
+				    	        'rgba(54, 162, 235, 0.6)',
+				    	        'rgba(255, 206, 86, 0.6)',
+				    	        'rgba(75, 192, 192, 0.6)',
+				    	        'rgba(153, 102, 255, 0.6)'
+					    	      ]
+					    	    }
+				    	    ]
+				    	  }
+				    	});
+				    
+				    
+				    var peopleChart = new Chart(peopleCanvas, {
+				    	  type: 'line', //图表类型
+				    	  data: {
+				    		// 表现在X轴上的数据，数组形式  ["China", "India", "United States", "Indonesia", "Brazil", "Pakistan", "Nigeria", "Bangladesh", "Russia", "Japan"]
+				    	    labels: months,
+				    	    //数据折线   data: [1379302771, 1281935911, 326625791, 260580739, 207353391, 204924861, 190632261, 157826578, 142257519, 126451398],
+				    	    datasets: [
+				    	    	{
+					    	      label: '月入住人数',
+					    	      data: peoples,
+					    	      backgroundColor: [
+					    	    	'rgba(255, 99, 132, 0.6)',
+					    	    	'rgba(153, 102, 255, 0.6)',
+					    	    	'rgba(255, 206, 86, 0.6)',
+					    	        'rgba(255, 99, 132, 0.6)',
+					    	        'rgba(54, 162, 235, 0.6)',
+					    	        'rgba(75, 192, 192, 0.6)',
+					    	        'rgba(255, 159, 64, 0.6)',
+					    	        'rgba(54, 162, 235, 0.6)',
+					    	        'rgba(255, 206, 86, 0.6)',
+					    	        'rgba(75, 192, 192, 0.6)',
+					    	        'rgba(153, 102, 255, 0.6)'
+					    	      ]
+					    	    }
+				    	    ]
+				    	  }
+				    	});
+
+				});
+			}
+		}
+	});
+});
+</script>
+<div class="container" id="workingArea">
+	<div class="row clearfix">
+	
+		<div th:include="include/admin/adminNavigator::html"></div>
+		
+		<div class="col-md-10 column">
+			<ul class="breadcrumb">
+			    <li class="active">数据统计</li>
+			</ul>
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">月营收统计</div>
+						<div class="panel-body">
+							<canvas id="totalChart" height="800px" width="800px"></canvas>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6">
+					<div class="panel panel-default">
+						<div class="panel-heading">月入住人数统计</div>
+						<div class="panel-body">
+							<canvas id="peopleChart" height="800px" width="800px"></canvas>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+</body>
+</html>
